@@ -56,6 +56,8 @@ Next, we use graphviz to layout the graph representation in DOT format.
 
 View the PDF and compare it to the input sequence. Now vary the parameter passed to `-m` of `vg construct` and visualize the result.
 
+on MARCC you can view the PDF files via loading the xpdf module and invoking 'xpdf foo.pdf'
+
 Ok, let's build a new graph that has some variants built into it. First, take a look at at `tiny/tiny.vcf.gz`, which contains variants in (gzipped) [VCF](https://samtools.github.io/hts-specs/VCFv4.2.pdf) format.
 
 	vg construct -r tiny/tiny.fa -v tiny/tiny.vcf.gz -m 32 >tiny.vg
