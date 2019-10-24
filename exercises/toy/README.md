@@ -57,7 +57,7 @@ Next, we use graphviz to layout the graph representation in DOT format.
 View the PDF and compare it to the input sequence. Now vary the parameter passed to `-m` of `vg construct` and visualize the result.
 
 	Note: On MARCC you can view the PDF files via loading the xpdf module and invoking 'xpdf foo.pdf'
-	
+
 	vg construct -r tiny/tiny.fa -m 24 >tiny.24ref.vg	#maximum node/contig/kmer length of 24
 	module load xpdf
 	vg view -d tiny.24ref.vg | dot -Tpdf -o tiny.24ref.pdf
@@ -66,7 +66,7 @@ View the PDF and compare it to the input sequence. Now vary the parameter passed
 Ok, let's build a new graph that has some variants built into it. First, take a look at at `tiny/tiny.vcf.gz`, which contains variants in (gzipped) [VCF](https://samtools.github.io/hts-specs/VCFv4.2.pdf) format.
 
 	vg construct -r tiny/tiny.fa -v tiny/tiny.vcf.gz -m 32 >tiny.vg
-	
+
 Visualize the outcome.  
 
 	vg view -d tiny.vg | dot -Tpdf -o tiny.pdf
@@ -75,18 +75,24 @@ Visualize the outcome.
 Ok, that's nice, but you might wonder which sequence of nodes actually corresponds to the sequence (`tiny.fa`) you started from? To keep track of that, vg adds a **path** to the graph. Let's add this path to the visualization.
 
 	# -- MARCC error, default older version of dot (2.30.1) (- from graphviz), conda install graphviz (2.40.1)
-	SPECIFY UPDATED VERSION OF DOT: /scratch/users/dduchen3@jhu.edu/miniconda3/bin/dot
-	vg view -dp tiny.ref.vg | /scratch/users/dduchen3@jhu.edu/miniconda3/bin/dot -Tpdf -o tiny.pdf
+	SPECIFY UPDATED VERSION OF DOT: /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/dot
+	OR /home-1/dduchen3@jhu.edu/scratch/miniconda3/bin/dot
+
+	#-- also try:
+	 module load imagemagick
+	 display tiny.pdf / tiny.png/ tiny.svg
+	vg view -dp tiny.ref.vg | /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/dot -Tpdf -o tiny.pdf
+	xpdf tiny.pdf
 
 You find the output too crowded? Option `-S` removes the sequence labels and only plots node IDs.
 
-	vg view -dpS tiny.ref.vg | dot -Tpdf -o tiny.pdf
-	
+	vg view -dpS tiny.ref.vg | /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/dot -Tpdf -o tiny.pdf
+
 	vg view -dpS tiny.ref.vg | /scratch/users/dduchen3@jhu.edu/miniconda3/bin/dot -Tpdf -o tiny.pdf
-	
+
 Another tool that comes with the graphviz package is *Neato*. It creates force-directed layouts of a graph.
 
-	vg view -dpS tiny.ref.vg | neato -Tpdf -o tiny.pdf
+	vg view -dpS tiny.ref.vg | /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/neato -Tpdf -o tiny.pdf
 
 For these small graphs, the difference it not that big, but for more involved cases, these layouts can be much easier to read.
 
