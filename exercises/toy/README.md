@@ -233,27 +233,26 @@ We can also download some real data mapping to this region to see if the differe
 
 		# augment the graph with all variation from the GAM except that implied by soft clips, saving to aug.vg.  augmented.gam contains the same reads as alignment.gam but mapped to aug.vg -i option includes the paths implied by the alignments into the graph
 		vg augment Unicycler_Pt1331.24ref.vg Unicycler_Pt1331.24ref.gam -C -A Unicycler_Pt1331.24ref.augmented.gam > Unicycler_Pt1331.24ref.augmented.vg
-## -- errors from here below for HBV data
-from: https://github.com/vgteam/vg/wiki/SV-genotyping-with-vg
-		vg augment Unicycler_Pt1331.24ref.vg Unicycler_Pt1331.24ref.gam -a pileup -S aug.support -Z aug.trans --recall > aug.vg
-		vg call aug.vg -s aug.support -z aug.trans -f vars.vcf.gz -u -G 3 -n 0 -S <SAMPLE> -r <CHROM> > genotypes.vcf
 #### consider novel variants - use augmented graph and gam (vg augment -C -A)
 		# Index our augmented graph
 		vg index Unicycler_Pt1331.24ref.augmented.vg -x Unicycler_Pt1331.24ref.augmented.xg
 		# Compute genotypes from the augmented gam
-
-#### -- THIS WORKS!!... kinda- can't view correct graph
-vg index -d mapped.gam.index -N mapped.gam
-vg genotype -v Unicycler_Pt1331.24ref.augmented.vg -G Unicycler_Pt1331.24ref.augmented.gam > calls.vcf
+#### -- THIS WORKS!!
+	vg index -d mapped.gam.index -N mapped.gam
+	vg genotype -v Unicycler_Pt1331.24ref.augmented.vg -G Unicycler_Pt1331.24ref.augmented.gam > calls.vcf
+edit the header to include ''##contig=<ID=1,assembly=HBV_Pt1331,length=3215>''
+	bcftools sort calls.vcf >calls.sort.vcf
+	bgzip -c calls.sort.vcf >calls.sort.vcf.gz
+	tabix -p vcf calls.sort.vcf.gz
 
 #### - visualize the graph with these variants
-	vg construct -r Unicycler_Pt1331.fasta -v calls.vcf -m 24 >Unicycler_Pt1331_wSimVariants.vg
-#### Visualize the outcome... error somewhere above  
+	vg construct -r Unicycler_Pt1331.fasta -v calls.sort.vcf.gz -m 24 >Unicycler_Pt1331_wSimVariants.vg
+#### Visualize the outcome
 	vg view -d Unicycler_Pt1331_wSimVariants.vg | dot -Tpdf -o Unicycler_Pt1331_wSimVariants.pdf
-	vg index -x z.xg z.vg
-	vg index -g z.gcsa -k 16 z.vg
+	vg index -x Unicycler_Pt1331_wSimVariants.xg Unicycler_Pt1331_wSimVariants.vg
+	vg index -g Unicycler_Pt1331_wSimVariants.gcsa -k 16 Unicycler_Pt1331_wSimVariants.vg
 
-	vg find -n 20 -x Unicycler_Pt1331.24ref.augmented.xg -c 10 | vg view -dp - | dot -Gcharset=latin1 -Tpdf -o 20c10.pdf
+	vg find -n 20 -x Unicycler_Pt1331_wSimVariants.xg -c 10 | vg view -dp - | dot -Gcharset=latin1 -Tpdf -o Node20c10.pdf
 	xpdf Node20c10.pdf
 
 The option `-c 10` tells `vg find` to include a context of 10 nodes in either direction around node 2401. You are welcome to experiment with different parameter to `vg find` to pull out pieces of the graph you are interested in.
