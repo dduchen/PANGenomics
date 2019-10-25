@@ -192,9 +192,6 @@ Try doing this on graphs with a range of minimum allele frequencies (e.g. 0.5, 0
 How do these files seem to scale with the minimum cutoff?
 
 ### Mapping data from real data to examine the improvement
-
-We can also download some real data mapping to this region to see if the different graphs provide varying levels of performance.
-
 ### Here, using an HBV assembly called with Unicycler, combines long-read and short-read sequencing to create a graph-based assembly genome:
 	# sample: ERR3253392 (Pt 1331, HBV Genotype C, Caucasian, CL and Nanopore sample)
 	# assembly fasta file copied from: /home-1/dduchen3@jhu.edu/work/dduchen3/HBV/NanoporeIllumina/Pt_1331_Cons_NoPreQC/assembly.fasta
@@ -219,7 +216,6 @@ We can also download some real data mapping to this region to see if the differe
 
 ####	This generates 1,000 (`-n`) reads of length (`-l`) with a substitution error rate of 1% (`-e`) and an indel error rate of 0.5% (`-i`). Adding `-a` instructs `vg sim` to output the true alignment paths in GAM format rather than just the plain sequences. Map can work on raw sequences (`-s` for a single sequence or `-r` for a text file with each sequence on a new line), FASTQ (`-f`), or FASTA (`-f` for two-line format and `-F` for a reference sequence where each sequence is over multiple lines).
 
-
 		#vg map -x z.xg -g z.gcsa -G z.sim >z.gam
 		vg map -x Unicycler_Pt1331.24ref.xg -g Unicycler_Pt1331.24ref.gcsa -G Unicycler_Pt1331.24ref.sim >Unicycler_Pt1331.24ref.gam
 
@@ -230,17 +226,20 @@ We can also download some real data mapping to this region to see if the differe
 
 		# surject the alignments back into the reference space of sequence "x", yielding a BAM file
 		vg surject -x Unicycler_Pt1331.24ref.xg -b Unicycler_Pt1331.24ref.gam > Unicycler_Pt1331.24ref.bam
-
+#### consider novel variants - use augmented graph and gam (vg augment -C -A)
 		# augment the graph with all variation from the GAM except that implied by soft clips, saving to aug.vg.  augmented.gam contains the same reads as alignment.gam but mapped to aug.vg -i option includes the paths implied by the alignments into the graph
 		vg augment Unicycler_Pt1331.24ref.vg Unicycler_Pt1331.24ref.gam -C -A Unicycler_Pt1331.24ref.augmented.gam > Unicycler_Pt1331.24ref.augmented.vg
-#### consider novel variants - use augmented graph and gam (vg augment -C -A)
+		#option: -A, --alignment-out FILE		save augmented GAM reads to FILE
+
+#### Index our augmented graph - Compute genotypes from the augmented gam
 		# Index our augmented graph
 		vg index Unicycler_Pt1331.24ref.augmented.vg -x Unicycler_Pt1331.24ref.augmented.xg
 		# Compute genotypes from the augmented gam
-#### -- THIS WORKS!!
+
 	vg index -d mapped.gam.index -N mapped.gam
 	vg genotype -v Unicycler_Pt1331.24ref.augmented.vg -G Unicycler_Pt1331.24ref.augmented.gam > calls.vcf
-edit the header to include ''##contig=<ID=1,assembly=HBV_Pt1331,length=3215>''
+#### need to edit the vcf file, include contig info, sort, compress, then index
+edit the header to include '##contig=<ID=1,assembly=HBV_Pt1331,length=3215>'
 	bcftools sort calls.vcf >calls.sort.vcf
 	bgzip -c calls.sort.vcf >calls.sort.vcf.gz
 	tabix -p vcf calls.sort.vcf.gz
