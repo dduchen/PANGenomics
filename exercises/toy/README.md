@@ -74,11 +74,12 @@ Visualize the outcome.
 
 Ok, that's nice, but you might wonder which sequence of nodes actually corresponds to the sequence (`tiny.fa`) you started from? To keep track of that, vg adds a **path** to the graph. Let's add this path to the visualization.
 
-	# -- MARCC error, default older version of dot (2.30.1) (- from graphviz), conda install graphviz (2.40.1)
-	SPECIFY UPDATED VERSION OF DOT: /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/dot
-	OR /home-1/dduchen3@jhu.edu/scratch/miniconda3/bin/dot
+#	# -- MARCC error, default older version of dot (2.30.1) (- from graphviz),
+	conda -n graphviz graphviz=2.40.1
+#	# EITHER - indicate you want UTF-8 encoding (which also doesn't work correctly) by including '-Gcharset=latin1' in your dot command or  SPECIFY UPDATED VERSION OF DOT: /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/dot
+#	OR /home-1/dduchen3@jhu.edu/scratch/miniconda3/bin/dot (... which ALSO doesn't work correctly...)
 
-	#-- also try:
+#	-- also try viewing files via 'display' from the imagemagick module:
 	 module load imagemagick
 	 display tiny.pdf / tiny.png/ tiny.svg
 	vg view -dp tiny.ref.vg | /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/dot -Tpdf -o tiny.pdf
@@ -86,13 +87,15 @@ Ok, that's nice, but you might wonder which sequence of nodes actually correspon
 
 You find the output too crowded? Option `-S` removes the sequence labels and only plots node IDs.
 
-	vg view -dpS tiny.ref.vg | /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/dot -Tpdf -o tiny.pdf
+  vg view -dpS tiny.ref.vg | dot -Tpdf -Gcharset=latin1 -o tiny.pdf #works best...
+#	vg view -dpS tiny.ref.vg | /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/dot -Tpdf -o tiny.pdf
 
-	vg view -dpS tiny.ref.vg | /scratch/users/dduchen3@jhu.edu/miniconda3/bin/dot -Tpdf -o tiny.pdf
+	vg view -dpS tiny.ref.vg | dot -Gcharset=latin1 -Tpdf -o tiny.pdf
 
 Another tool that comes with the graphviz package is *Neato*. It creates force-directed layouts of a graph.
 
-	vg view -dpS tiny.ref.vg | /home-1/dduchen3@jhu.edu/scratch/miniconda3/envs/graphviz/bin/neato -Tpdf -o tiny.pdf
+	vg view -dpS tiny.ref.vg | neato -Tpdf -Gcharset=latin1 -o tiny.pdf
+	xpdf tiny.pdf
 
 For these small graphs, the difference it not that big, but for more involved cases, these layouts can be much easier to read.
 
@@ -102,6 +105,12 @@ Ok, let's step up to a slightly bigger example.
 	ln -s ../vg/test/1mb1kgp
 
 This directory contains 1Mbp of 1000 Genomes data for chr20:1000000-2000000. As for the tiny example, let's' build one linear graph that only contains the reference sequence and one graph that additionally encodes the known sequence variation. The reference sequence is contained in `1mb1kgp/z.fa`, and the variation is contained in `1mb1kgp/z.vcf.gz`. Make a reference-only graph named `ref.vg`, and a graph with variation named `z.vg`. Look at the previous examples to figure out the command.
+
+	vg construct -r ../vg/test/1mb1kgp/z.fa -m 32 >ref.vg
+	vg construct -r ../vg/test/1mb1kgp/z.fa -v ../vg/test/1mb1kgp/z.vcf.gz -m 32 >z.vg
+Visualize the outcome.  
+	vg view -d z.vg | dot -Tpdf -o z.pdf
+
 
 You might be tempted to visualize these graphs (and of course you are welcome to try), but they are sufficiently big already that neato can run out of memory and crash.
 
@@ -114,7 +123,8 @@ Passing option `-k 16` tells vg to use a k-mer size of *16k*. The best choice of
 
 As mentioned above, the whole graph is unwieldy to visualize. But thanks to the XG representation, we can now quickly **find** individual pieces of the graph. Let's extract the vicinity of the node with ID 2401 and create a PDF.
 
-	vg find -n 2401 -x z.xg -c 10 | vg view -dp - | dot -Tpdf -o 2401c10.pdf
+	vg find -n 2401 -x z.xg -c 10 | vg view -dp - | dot -Gcharset=latin1 -Tpdf -o 2401c10.pdf
+	xpdf 2401c10.pdf
 
 The option `-c 10` tells `vg find` to include a context of 10 nodes in either direction around node 2401. You are welcome to experiment with different parameter to `vg find` to pull out pieces of the graph you are interested in.  
 
@@ -145,10 +155,12 @@ For evaluation purposes, vg has the capability to compare the newly created read
 This outputs the comparison between mapped and and true locations in JSON format. We can use this quickly check if our alignment process is doing what we expect on the variation graph we're working on. For instance, we could set alignment parameters that cause problems for our alignment and then observe this using the `--compare` feature of the mapper. For example, we can map two ways and see a difference in how correct our alignment is:
 
 	vg map -x z.xg -g z.gcsa -G z.sim --compare -j | jq .correct | sed s/null/0/ | awk '{i+=$1; n+=1} END {print i/n}'
+# 0.99367 --> looking at total correctly mapped / all reads
 
 In contrast, if we were to set a very high minimum match length we would throw away a lot of the information we need to make good mappings, resulting in a low correctness metric:
 
     vg map -k 51 -x z.xg -g z.gcsa -G z.sim --compare -j | jq .correct | sed s/null/0/ | awk '{i+=$1; n+=1} END {print i/n}'
+# 0.81471 --> looking at total correctly mapped with a k-mer size of 51 / all reads
 
 It is essential to understand that our alignment process works against the graph which we have constructed. This pattern allows us to quickly understand if the particular graph and configuration of the mapper produce sensible results at least given a simulated alignment set. Note that the alignment comparison will break down if we simulate from different graphs, as it depends on the coordinate system of the given graph.
 
@@ -156,9 +168,13 @@ It is essential to understand that our alignment process works against the graph
 
 To get a first impression of how a graph reference helps us do a better job while mapping reads. We will construct a series of graphs from a linear reference to a graph with a lot variation and look at mapping rates, i.e. at the fraction of reads that can successfully be mapped to the graph. For examples, we might include variation above given allele frequency (AF) cutoffs and vary this cutoff. You can make a VCF with a minimum allele fequency with this command (replace `FREQ` with the frequency you want):
 
-    vcffilter -f 'AF > FREQ' 1mb1kgp/z.vcf.gz > min_af_filtered.vcf
+	#install program with vcffilter: https://github.com/vcflib/vcflib
+	#/home-1/dduchen3@jhu.edu/data/graph/tools/vcffilter
+ vcffilter -f 'AF > FREQ' 1mb1kgp/z.vcf.gz > min_af_filtered.vcf
+	# MAF 30%:
+	/home-1/dduchen3@jhu.edu/data/graph/tools/vcffilter -f 'AF > 0.3' 1mb1kgp/z.vcf.gz > min_af_filtered.vcf
 
-Alternatively, you can also use `bcftools` to subset the VCFs. The ``--exculde`` option in conjunction with custom [expressions](https://samtools.github.io/bcftools/bcftools-man.html#expressions) is particularly useful to this end. You may also want to think about other properties that would be useful to filter on.
+Alternatively, you can also use `bcftools` to subset the VCFs. The ``--exclude`` option in conjunction with custom [expressions](https://samtools.github.io/bcftools/bcftools-man.html#expressions) is particularly useful to this end. You may also want to think about other properties that would be useful to filter on.
 
 With this input you should be able to run the whole pipeline:
 
@@ -173,6 +189,73 @@ Try doing this on graphs with a range of minimum allele frequencies (e.g. 0.5, 0
     ls -sh *.gcsa*
 
 How do these files seem to scale with the minimum cutoff?
+
+### Mapping data from real data to examine the improvement
+
+We can also download some real data mapping to this region to see if the different graphs provide varying levels of performance.
+
+# Here, using an HBV assembly called with Unicycler, combines long-read and short-read sequencing to create a graph-based assembly genome:
+	# sample: ERR3253392 (Pt 1331, HBV Genotype C, Caucasian, CL and Nanopore sample)
+	# assembly fasta file copied from: /home-1/dduchen3@jhu.edu/work/dduchen3/HBV/NanoporeIllumina/Pt_1331_Cons_NoPreQC/assembly.fasta
+	#Here called: Unicycler_Pt1331.fasta
+
+# create a vcf from the graph-based reference/assembly
+	#1) create graph of the reference (the assembly)
+	#2) simulate a bunch of reads from the graph reference
+	#3) map illumina-based short-reads to the graph
+#--- not able to do this yet:
+	#4) surject alignments back into reference space of the sequence, getting a BAM file
+	#5) augment the graph with the variation now present
+	#6) call variants that are present in the graphs
+		#note: could also call only the novel variants, but reference did not contain any variation to begin with
+
+		vg construct -r Unicycler_Pt1331.fasta -m 24 >Unicycler_Pt1331.24ref.vg
+			vg view -d Unicycler_Pt1331.24ref.vg | dot -Tpdf -o Unicycler_Pt1331.ref.pdf
+			# 134 k-mers of size 24! fits all 3215 bases
+		vg index -x Unicycler_Pt1331.24ref.xg Unicycler_Pt1331.24ref.vg
+		vg index -g Unicycler_Pt1331.24ref.gcsa -k 16 Unicycler_Pt1331.24ref.vg
+		vg sim -x Unicycler_Pt1331.24ref.xg -l 100 -n 1000 -e 0.01 -i 0.005 -a >Unicycler_Pt1331.24ref.sim
+
+#	This generates 1,000 (`-n`) reads of length (`-l`) with a substitution error rate of 1% (`-e`) and an indel error rate of 0.5% (`-i`). Adding `-a` instructs `vg sim` to output the true alignment paths in GAM format rather than just the plain sequences. Map can work on raw sequences (`-s` for a single sequence or `-r` for a text file with each sequence on a new line), FASTQ (`-f`), or FASTA (`-f` for two-line format and `-F` for a reference sequence where each sequence is over multiple lines).
+
+
+		#vg map -x z.xg -g z.gcsa -G z.sim >z.gam
+		vg map -x Unicycler_Pt1331.24ref.xg -g Unicycler_Pt1331.24ref.gcsa -G Unicycler_Pt1331.24ref.sim >Unicycler_Pt1331.24ref.gam
+
+#	show us the first alignment in the set:
+		    vg view -a Unicycler_Pt1331.24ref.gam | head -1 | vg view -JaG - >first_aln.gam
+		    vg find -x Unicycler_Pt1331.24ref.xg -G first_aln.gam | vg view -dA first_aln.gam - | dot -Tpdf -o first_aln.pdf
+				xpdf first_aln.pdf # aligning to around ~k-mer 73
+
+		# surject the alignments back into the reference space of sequence "x", yielding a BAM file
+		vg surject -x Unicycler_Pt1331.24ref.xg -b Unicycler_Pt1331.24ref.gam > Unicycler_Pt1331.24ref.bam
+
+		# augment the graph with all variation from the GAM except that implied by soft clips, saving to aug.vg.  augmented.gam contains the same reads as alignment.gam but mapped to aug.vg -i option includes the paths implied by the alignments into the graph
+		vg augment Unicycler_Pt1331.24ref.vg Unicycler_Pt1331.24ref.gam -C -A Unicycler_Pt1331.24ref.augmented.gam > Unicycler_Pt1331.24ref.augmented.vg
+# -- errors from here below for HBV data
+# from: https://github.com/vgteam/vg/wiki/SV-genotyping-with-vg
+		vg augment Unicycler_Pt1331.24ref.vg Unicycler_Pt1331.24ref.gam -a pileup -S aug.support -Z aug.trans --recall > aug.vg
+		vg call aug.vg -s aug.support -z aug.trans -f vars.vcf.gz -u -G 3 -n 0 -S <SAMPLE> -r <CHROM> > genotypes.vcf
+# consider novel variants - use augmented graph and gam (vg augment -C -A)
+		# Index our augmented graph
+		vg index Unicycler_Pt1331.24ref.augmented.vg -x Unicycler_Pt1331.24ref.augmented.xg
+		# Compute genotypes from the augmented gam
+
+# -- THIS WORKS!!...
+vg index -d mapped.gam.index -N mapped.gam
+vg genotype -v Unicycler_Pt1331.24ref.augmented.vg -G Unicycler_Pt1331.24ref.augmented.gam > calls.vcf
+
+#-- visualize the graph with these variants
+	vg construct -r Unicycler_Pt1331.fasta -v calls.vcf -m 24 >Unicycler_Pt1331_wSimVariants.vg
+#Visualize the outcome.  
+	vg view -d Unicycler_Pt1331_wSimVariants.vg | dot -Tpdf -o Unicycler_Pt1331_wSimVariants.pdf
+	vg index -x z.xg z.vg
+	vg index -g z.gcsa -k 16 z.vg
+
+	vg find -n 20 -x Unicycler_Pt1331.24ref.augmented.xg -c 10 | vg view -dp - | dot -Gcharset=latin1 -Tpdf -o 20c10.pdf
+	xpdf Node20c10.pdf
+
+The option `-c 10` tells `vg find` to include a context of 10 nodes in either direction around node 2401. You are welcome to experiment with different parameter to `vg find` to pull out pieces of the graph you are interested in.
 
 ### Mapping data from real data to examine the improvement
 
