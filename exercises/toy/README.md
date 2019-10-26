@@ -265,11 +265,11 @@ See if the graphs alignment provides varying levels of performance compared to b
 mkdir realdat
 cd realdat
 We can run a single-ended alignment test to compare with bwa mem:
-Need /home-1/dduchen3@jhu.edu/work/dduchen3/HBV/NanoporeIllumina/
-module load bwa
-	Note:
-	- using Sambamba: fast processing of NGS alignment formats [Sambamba Paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4765878/)
-	- using pipe viewer (pv) to monitor progress for vg map: available at: http://www.ivarch.com/programs/pv.shtml
+		Need /home-1/dduchen3@jhu.edu/work/dduchen3/HBV/NanoporeIllumina/
+			module load bwa
+			Note:
+			- using Sambamba: fast processing of NGS alignment formats [Sambamba Paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4765878/)
+			- using pipe viewer (pv) to monitor progress for vg map: available at: http://www.ivarch.com/programs/pv.shtml
 
 
 	  bwa index ../Unicycler_Pt1331.fasta
