@@ -298,6 +298,9 @@ We can pick a subset of reads with high or low score differentiation to realign 
     cat /home-1/dduchen3@jhu.edu/work/dduchen3/HBV/NanoporeIllumina/ERR3253392_1.fastq | awk '{ printf("%s",$0); n++; if(n%4==0) { printf("\n");} else { printf("\t\t");} }' | grep -Ff <(zcat compared.tsv.gz | awk '{ if ($4 > 10) print $1 }' ) | sed 's/\t\t/\n/g' | gzip >better.fq.gz ; wc -l better.fq.gz
 	158 better Alignments
 
+A histogram comparing the mapping abilities of BWA-MEM and VG Map:
+![Mapping Comparison](https://raw.githubusercontent.com/dduchen/PANGenomics/master/images/Mapping_Comparison.PNG)
+
 Let's dig into some of the more-highly differentiated reads to understand why vg is providing a better (or worse) alignment. How might you go about this? There are many ways you could do this, but you may find some of these commands useful:
 
 ###### EXTRA INFO/COMMANDS
