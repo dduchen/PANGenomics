@@ -15,25 +15,25 @@ This course targets all researchers interested in learning about an exciting par
 
 This course is oriented towards biologists and bioinformaticians with at least an intermediate level of experience working with sequencing data formats and methods in the unix shell.
 The course will be of particular interest to researchers investigating organisms without a reference genome or populations featuring high levels of genetic diversity.
-    
+
 #### Pre- requisites (optional)
 
 ## Schedule
 ### Day 1
-#### [Intro slides](https://github.com/Pfern/PANGenomics/blob/master/slides/day1-intro.pdf)
-#### [Full slide deck](https://docs.google.com/presentation/d/1Egz5b6oyiyaQ-ecVaTf-waSZlnJT5yNoR578PlpKsTY/edit?usp=sharing)
-#### Practical 1: [toy examples](https://github.com/Pfern/PANGenomics/tree/master/exercises/toy)
+#### [Intro slides](https://drive.google.com/open?id=1XgHaDiUFQq1kyexqMOp2OtMZWbvpTCP1)
+#### [Full slide deck](https://drive.google.com/open?id=1rAz6iwkAHJQroZLjgB_TdzXpKV6_LwFT)
+#### Practical 1: [toy examples](https://github.com/dduchen/PANGenomics/tree/master/exercises/toy)
 ### Day 2
-#### [Slides](https://docs.google.com/presentation/d/1fBGt2OLc9HVxH594TWeQ5i1sbmFwi555ibR1RgGNxmg/edit?usp=sharing)
-#### Practical 2: [HIV](https://github.com/Pfern/PANGenomics/tree/master/exercises/HIV)
+#### [Slides](https://drive.google.com/open?id=1oeAAbnxWmvtbnwDmTtnwdwZgBF2yPYPY)
+#### Practical 2: [HIV](https://github.com/dduchen/PANGenomics/tree/master/exercises/HIV)
 ### Day 3
-#### [Slides](https://docs.google.com/presentation/d/1S-1zzyw5xmwKmBsPkE5aD3AoipWapSLgtMhO02X4_pM/edit?usp=sharing)
-#### Practical 3: [Bacteria](https://github.com/Pfern/PANGenomics/tree/master/exercises/bacteria)
+#### [Slides](https://drive.google.com/open?id=1L6RRp6L_fEQhNRvmixJwtwwjBETnzEbQ)
+#### Practical 3: [Bacteria](https://github.com/dduchen/PANGenomics/tree/master/exercises/bacteria)
 ### Day 4
-#### [Slides](https://docs.google.com/presentation/d/1qKff75AULx-pr8G-kGQHZaDi4hSL-ruwa-syMODq7lo/edit?usp=sharing)
-#### [Practical overview](https://docs.google.com/presentation/d/18Se1rQcT_MCRGitcqwg_YmT4irMqdJEfVLpoHAXfEUk/edit?usp=sharing)
-#### [Theory slides](https://docs.google.com/presentation/d/1iGv_XRDjabxVpvjLxz007jepXFu8y0e7Xmmjf-TwCxg/edit?usp=sharing)
-#### Practical 4: [MHC](https://github.com/Pfern/PANGenomics/tree/master/exercises/HLA)
+#### [Slides](https://drive.google.com/open?id=1A5c5KTSN9e_5bpG-FtaUEDpDXviddGj9)
+#### [Practical overview](https://drive.google.com/open?id=1JCxDRNCE39rNrJof8O0xglOxdBum7zBU)
+#### [Theory slides](https://drive.google.com/open?id=1aPidUYv6IRXpPqV8b4wyYnDjZi0axJtL)
+#### Practical 4: [MHC](https://github.com/dduchen/PANGenomics/tree/master/exercises/HLA)
 
 
 ## Learning objectives
@@ -146,7 +146,7 @@ Tobias received his undergraduate education at Bielefeld University (Germany), w
 
 ## Course Assistant
 ### Jordan Eizenga
-![Jordan Eizenga](https://cgl.genomics.ucsc.edu/wp-content/uploads/2016/07/CGL_Team_Pics_Jordan_Einzeinga.png) 
+![Jordan Eizenga](https://cgl.genomics.ucsc.edu/wp-content/uploads/2016/07/CGL_Team_Pics_Jordan_Einzeinga.png)
 
 [Jordan Eizenga](https://github.com/jeizenga) is a PhD student in the Computational Genomics Lab at the Unversity of California Santa Cruz. His advisors are David Haussler and Benedict Paten. Jordan was originally trained as a mathematician, but made the switch to bioinformatics in 2015. Now his research focuses on using graph data structures in genomics. He has published on both theoretical and practical aspects of this problem, and he has been heavily involved in the development of the [vg](https://github.com/vgteam/vg) project.
 
@@ -158,4 +158,3 @@ Tobias received his undergraduate education at Bielefeld University (Germany), w
 - [ ] For each outcome design an exercise
 - [ ] For each exercise identify the short lecture needed and the materials
 - [ ] Compose a schedule, spreading moments of wrap-up, feedback, Q&A, etc.
-
