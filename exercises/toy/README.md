@@ -256,6 +256,10 @@ edit the header to include '##contig=<ID=1,assembly=HBV_Pt1331,length=3215>'
 
 The option `-c 10` tells `vg find` to include a context of 10 nodes in either direction around node 2401. You are welcome to experiment with different parameter to `vg find` to pull out pieces of the graph you are interested in.
 
+See the resulting image here:
+
+(https://raw.githubusercontent.com/dduchen/PANGenomics/master/images/Node20_wVariants_HBV.PNG)
+
 ### Mapping data from real data to examine the improvement - from actual illumina reads for this sample
 
 See if the graphs alignment provides varying levels of performance compared to bwa-mem/traditional aligners.
