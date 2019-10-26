@@ -256,12 +256,61 @@ edit the header to include '##contig=<ID=1,assembly=HBV_Pt1331,length=3215>'
 
 The option `-c 10` tells `vg find` to include a context of 10 nodes in either direction around node 2401. You are welcome to experiment with different parameter to `vg find` to pull out pieces of the graph you are interested in.
 
-### Mapping data from real data to examine the improvement - from actual 'toy' directory
+### Mapping data from real data to examine the improvement - from actual illumina reads for this sample
 
-We can also download some real data mapping to this region to see if the different graphs provide varying levels of performance.
+See if the graphs alignment provides varying levels of performance compared to bwa-mem/traditional aligners.
+
+################################## TO DO: conver this to viral fastq data
 
 mkdir realdat
 cd realdat
+We can run a single-ended alignment test to compare with bwa mem:
+Need the HG002-NA24385-20_1M-2M-50x_1.fq.gz OR HG002-NA24385-20_1M-2M-50x_2.fq.gz files
+
+    samtools fastq -1 HG002-NA24385-20_1M-2M-50x_1.fq.gz -2 HG002-NA24385-20_1M-2M-50x_2.fq.gz data/HG002-NA24385-20_1M-2M-50x.bam
+    bwa mem z.fa HG002-NA24385-20_1M-2M-50x_1.fq.gz | sambamba view -S -f json /dev/stdin | jq -cr '[.qname, .tags.AS] | @tsv' >bwa_mem.scores.tsv
+    vg map --drop-full-l-bonus -d z.AF0.01 -f HG002-NA24385-20_1M-2M-50x_1.fq.gz -j | pv -l | jq -cr '[.name, .score] | @tsv' >vg_map.AF0.01.scores.tsv
+
+Then we can compare the results using sort and join:
+
+    join <(sort bwa_mem.scores.tsv ) <(sort vg_map.AF0.01.scores.tsv ) | awk '{ print $0, $3-$2 }' | tr ' ' '\t' | sort -n -k 4 | pv -l | gzip >compared.tsv.gz
+
+We can then see how many alignments have improved or worse scores:
+
+    zcat compared.tsv.gz | awk '{ if ($4 < 0) print $1 }' | wc -l
+    zcat compared.tsv.gz | awk '{ if ($4 == 0) print $1 }' | wc -l
+    zcat compared.tsv.gz | awk '{ if ($4 > 0) print $1 }' | wc -l
+
+In general, the scores improve. Try plotting a histogram of the differences to see the extent of the effect.
+
+We can pick a subset of reads with high or low score differentiation to realign and compare:
+
+    zcat HG002-NA24385-20_1M-2M-50x_1.fq.gz | awk '{ printf("%s",$0); n++; if(n%4==0) { printf("\n");} else { printf("\t\t");} }' | grep -Ff <(zcat compared.tsv.gz | awk '{ if ($4 < -10) print $1 }' ) | sed 's/\t\t/\n/g' | gzip >worse.fq.gz
+    zcat HG002-NA24385-20_1M-2M-50x_1.fq.gz | awk '{ printf("%s",$0); n++; if(n%4==0) { printf("\n");} else { printf("\t\t");} }' | grep -Ff <(zcat compared.tsv.gz | awk '{ if ($4 > 10) print $1 }' ) | sed 's/\t\t/\n/g' | gzip >better.fq.gz
+
+Let's dig into some of the more-highly differentiated reads to understand why vg is providing a better (or worse) alignment. How might you go about this? There are many ways you could do this, but you may find some of these commands useful:
+
+- `vg view -aj ALN.gam` : convert a .gam alignment into a text-based JSON representation with one alignment per line
+- `vg view -aJG ALN.json` : convert the JSON representation back into a .gam alignment file
+- `vg mod -g ID -x N GRAPH.vg` : extract the subgraph that is within `N` nodes from node `ID`
+- `vg mod -P -i ALN.gam GRAPH.vg` : add the paths from the alignment into the graph (similar to the reference path in the exercise)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### From the original PANGenomics repo - Human alignment comparisons:
 
 module load samtools
 
