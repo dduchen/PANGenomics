@@ -13,12 +13,16 @@ The data were are using for this is based an artifical lab mix of five viruses:
 - Di Giallonardo, et al., Nucleic Acids Research, Volume 42, Issue 14, pp. e115, 2014. [https://doi.org/10.1093/nar/gku537](https://doi.org/10.1093/nar/gku537)
 
 The five reference sequences underlying the mix can be find in the above git repository, see at https://github.com/cbg-ethz/5-virus-mix/blob/master/data/REF.fasta.
+    wget https://raw.githubusercontent.com/cbg-ethz/5-virus-mix/master/data/REF.fasta
 
-At home, you can rely on sra-tools (more specifically `fastq-dump`) to download data from SRA. At GTPB, Illumina and PacBio data is already available at your workstations.
+At home, you can rely on sra-tools (more specifically `fastq-dump`) to download data from SRA.
+    module load sra-tools
+    fastq-dump --split-files SRR961514
+    fastq-dump --split-files SRR961669
 
 More concretely, we ask you to work on the following tasks in groups of four (in any order, based on your groups preferences):
 
-- Study the effect of using a pan-genone reference on the read alignments. First, spot some examples of regions of high sequence diversity within the reads.  Construct a pan-genome representation of the five reference genomes, use it to align reads to it, surject them to a linear reference and compare the results to BWA. Second, think of ways to quantify the quality of the alignments across all reads and study the effect of different strategies for pan-genome construction on that measure.
+- Study the effect of using a pan-genome reference on the read alignments. First, spot some examples of regions of high sequence diversity within the reads.  Construct a pan-genome representation of the five reference genomes, use it to align reads to it, surject them to a linear reference and compare the results to BWA. Second, think of ways to quantify the quality of the alignments across all reads and study the effect of different strategies for pan-genome construction on that measure.
 
 - Analyze the genetic diversity in the five virus mix. Assume you don't know that five viruses went into that sample. Think of ways to visualize the structure of the data sets (Illumina and PacBio). Could you have inferred the number of present viruses from your visualization? Discuss why this is (or is not) possible.
 
@@ -43,9 +47,9 @@ These are things we ran into during the practical, some of which may not have be
 
 #### vg viewing
 
-Rendering the HPV graphs using graphviz can be difficult. One way to reduce the difficulty of rendering (in terms of runtime and memory) is to change the rendering in vg view. Several options can help. First, you can use `vg view -d` alone, not rendering the paths as this can make the renderng much more complex. Secondly, you can add the "simple" mode flag, which removes the node labels, `vg view -dS` or `vg view -dpS`.
+Rendering the HIV graphs using graphviz can be difficult. One way to reduce the difficulty of rendering (in terms of runtime and memory) is to change the rendering in vg view. Several options can help. First, you can use `vg view -d` alone, not rendering the paths as this can make the renderng much more complex. Secondly, you can add the "simple" mode flag, which removes the node labels, `vg view -dS` or `vg view -dpS`.
 
-You may find that large PDFs cannot be read by different PDF viewers like evince. As a workaround, the
+You may find that large PDFs cannot be read by different PDF viewers like evince. Attempt the xpdf module perhaps? Otherwise, can select specific nodes with surrounding number of nodes to view (in toy/exercise 1).
 
 #### Surjection
 
@@ -75,14 +79,15 @@ An earlier version of the [ideas.md](https://github.com/Pfern/PANGenomics/blob/m
 
 #### Pruning
 
-You may have noticed that you cannot directly index the HIV graph generated from `vg msga` using `vg index`. The reason is that the graph contains regions of high complexity. GCSA2 indexing will enumerate _all_ kmers up to 256bp within the graph, and in regions of high complexity this may mean many (>billions) of kmers.
+You may have noticed that you cannot directly index the HIV graph generated from `vg msga` using `vg index`. The reason is that the graph contains regions of high complexity.
+GCSA2 indexing will enumerate _all_ kmers up to 256bp within the graph, and in regions of high complexity this may mean many (>billions) of kmers.
 
 To resolve this problem, we "prune" the graph with `vg mod -pl 16 -e 3` or `vg prune`. Try pruning the graph and rendering it with `vg view -d` to see what happens to the structures within it under certain pruning modes. We pass the pruned graph to `vg index -g`, indexing the kmers in it. Then when we map we give `vg map` the full graph (in xg format) and the GCSA based on the pruned graph. The MEM finding uses the pruned graph, but when we do the local alignment we can efficiently work with the full, un-pruned graph, returning alignments in its space.
 
 #### ClustalO input
 
 #### Assembly options
-Currently, there are two assemblers installed on the workstations: 
+Currently, there are two assemblers installed on the workstations:
 
 - [bcalm2](https://github.com/GATB/bcalm), which just builds a compact De Bruijn graph, that is a graph composed of unitigs. Use you can use the `convertToGFA.py` script to convert the output to GFA.
 
