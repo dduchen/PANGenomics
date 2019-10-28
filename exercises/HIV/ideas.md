@@ -172,3 +172,4 @@ ggbiplot(pacbio.dist.pca) + geom_point(aes(color=pacbio.dist[5:nrow(pacbio.dist)
 ```
 
 Creates the image below:
+![HIV PCA and Vectorization](https://raw.githubusercontent.com/dduchen/PANGenomics/master/images/HIV_Exercise2_PacBio_PCA.PNG)
